@@ -54,8 +54,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.abryan.cinetrail.R
+import com.abryan.cinetrail.ui.component.DetailLoadingSkeleton
 import com.abryan.cinetrail.ui.component.ErrorState
-import com.abryan.cinetrail.ui.component.LoadingState
 import com.abryan.cinetrail.ui.component.WatchProvidersSection
 import com.abryan.cinetrail.ui.theme.StarGold
 import com.abryan.cinetrail.viewmodel.DetailViewModel
@@ -114,7 +114,7 @@ fun DetailScreen(
                 .padding(innerPadding)
         ) {
             if (uiState.isLoading) {
-                LoadingState(modifier = Modifier.align(Alignment.Center))
+                DetailLoadingSkeleton()
             } else if (uiState.isError || uiState.movieDetail == null) {
                 ErrorState(
                     onRetry = { viewModel.loadMovieDetails(movieId, currentLanguage) },
