@@ -40,9 +40,24 @@ class MovieRepository(
         }
     }
 
-    suspend fun getTopRatedMovies(language: String, page: Int = 1): List<MovieDto> {
+    suspend fun getTopRatedMovies(
+        language: String,
+        country: String? = null,
+        genreId: Int? = null,
+        page: Int = 1
+    ): List<MovieDto> {
         return try {
-            api.getTopRatedMovies(language = language, page = page).results
+            if (country != null || genreId != null) {
+                api.discoverMovies(
+                    language = language,
+                    country = country,
+                    genreId = genreId,
+                    sortBy = "vote_average.desc",
+                    page = page
+                ).results
+            } else {
+                api.getTopRatedMovies(language = language, page = page).results
+            }
         } catch (e: Exception) {
             emptyList()
         }

@@ -14,17 +14,25 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+enum class MovieCategory {
+    POPULAR,
+    TOP_RATED
+}
+
 data class DashboardUiState(
     val isLoading: Boolean = true,
     val isError: Boolean = false,
     val trendingMovies: List<MovieDto> = emptyList(),
-    val popularMovies: List<MovieDto> = emptyList(),
+    val displayedMovies: List<MovieDto> = emptyList(),
+    val selectedCategory: MovieCategory = MovieCategory.POPULAR,
     val genres: List<GenreDto> = emptyList(),
     val genresMap: Map<Int, String> = emptyMap(),
     val selectedCountry: String? = null,
     val selectedGenreId: Int? = null,
     val currentLanguage: String = "en-US"
-)
+) {
+    val popularMovies: List<MovieDto> get() = displayedMovies
+}
 
 val COUNTRY_OPTIONS = listOf(
     CountryOption(null, R.string.all_countries),
@@ -51,15 +59,24 @@ class DashboardViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, isError = false)
             try {
-                val language = _uiState.value.currentLanguage
+                val state = _uiState.value
+                val language = state.currentLanguage
                 val genres = repository.getGenres(language)
                 val genresMap = genres.associate { it.id to it.name }
                 val trending = repository.getTrendingMovies(language)
-                val popular = repository.getPopularMovies(
-                    language = language,
-                    country = _uiState.value.selectedCountry,
-                    genreId = _uiState.value.selectedGenreId
-                )
+                val movies = if (state.selectedCategory == MovieCategory.TOP_RATED) {
+                    repository.getTopRatedMovies(
+                        language = language,
+                        country = state.selectedCountry,
+                        genreId = state.selectedGenreId
+                    )
+                } else {
+                    repository.getPopularMovies(
+                        language = language,
+                        country = state.selectedCountry,
+                        genreId = state.selectedGenreId
+                    )
+                }
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
@@ -67,7 +84,7 @@ class DashboardViewModel(
                     genres = genres,
                     genresMap = genresMap,
                     trendingMovies = trending,
-                    popularMovies = popular
+                    displayedMovies = movies
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
@@ -76,6 +93,12 @@ class DashboardViewModel(
                 )
             }
         }
+    }
+
+    fun selectCategory(category: MovieCategory) {
+        if (_uiState.value.selectedCategory == category) return
+        _uiState.value = _uiState.value.copy(selectedCategory = category)
+        loadMovies()
     }
 
     fun selectCountry(countryCode: String?) {
@@ -100,16 +123,25 @@ class DashboardViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, isError = false)
             try {
-                val language = _uiState.value.currentLanguage
-                val popular = repository.getPopularMovies(
-                    language = language,
-                    country = _uiState.value.selectedCountry,
-                    genreId = _uiState.value.selectedGenreId
-                )
+                val state = _uiState.value
+                val language = state.currentLanguage
+                val movies = if (state.selectedCategory == MovieCategory.TOP_RATED) {
+                    repository.getTopRatedMovies(
+                        language = language,
+                        country = state.selectedCountry,
+                        genreId = state.selectedGenreId
+                    )
+                } else {
+                    repository.getPopularMovies(
+                        language = language,
+                        country = state.selectedCountry,
+                        genreId = state.selectedGenreId
+                    )
+                }
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     isError = false,
-                    popularMovies = popular
+                    displayedMovies = movies
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
@@ -120,6 +152,7 @@ class DashboardViewModel(
         }
     }
 }
+
 
 data class DetailUiState(
     val isLoading: Boolean = true,
