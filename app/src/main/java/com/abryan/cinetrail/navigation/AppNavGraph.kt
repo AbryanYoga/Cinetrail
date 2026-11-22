@@ -1,5 +1,9 @@
 package com.abryan.cinetrail.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -36,7 +40,31 @@ fun AppNavGraph(
     NavHost(
         navController = navController,
         startDestination = Screen.Dashboard.route,
-        modifier = modifier
+        modifier = modifier,
+        enterTransition = {
+            fadeIn(animationSpec = tween(280)) + slideIntoContainer(
+                AnimatedContentTransitionScope.SlideDirection.Start,
+                animationSpec = tween(280)
+            )
+        },
+        exitTransition = {
+            fadeOut(animationSpec = tween(280)) + slideOutOfContainer(
+                AnimatedContentTransitionScope.SlideDirection.Start,
+                animationSpec = tween(280)
+            )
+        },
+        popEnterTransition = {
+            fadeIn(animationSpec = tween(280)) + slideIntoContainer(
+                AnimatedContentTransitionScope.SlideDirection.End,
+                animationSpec = tween(280)
+            )
+        },
+        popExitTransition = {
+            fadeOut(animationSpec = tween(280)) + slideOutOfContainer(
+                AnimatedContentTransitionScope.SlideDirection.End,
+                animationSpec = tween(280)
+            )
+        }
     ) {
         composable(Screen.Dashboard.route) {
             DashboardScreen(
