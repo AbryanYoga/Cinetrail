@@ -1,6 +1,7 @@
 package com.abryan.cinetrail.ui.component
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -42,6 +43,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -205,7 +207,8 @@ fun HeroCarousel(
 ) {
     if (trendingMovies.isEmpty()) return
 
-    val pagerState = rememberPagerState(pageCount = { trendingMovies.size })
+    val displayCount = trendingMovies.size.coerceAtMost(10)
+    val pagerState = rememberPagerState(pageCount = { displayCount })
 
     Column(modifier = modifier.fillMaxWidth()) {
         HorizontalPager(
@@ -219,7 +222,11 @@ fun HeroCarousel(
             val movie = trendingMovies[page]
             Card(
                 shape = RoundedCornerShape(20.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 4.dp,
+                    pressedElevation = 8.dp
+                ),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
                 modifier = Modifier
                     .fillMaxSize()
                     .clickable { onMovieClick(movie.id) }
@@ -232,7 +239,7 @@ fun HeroCarousel(
                         modifier = Modifier.fillMaxSize()
                     )
 
-                    // Gradient overlay
+                    // Overlay gradien kontras tinggi untuk memastikan keterbacaan teks
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -240,35 +247,62 @@ fun HeroCarousel(
                                 Brush.verticalGradient(
                                     colors = listOf(
                                         Color.Transparent,
-                                        Color.Black.copy(alpha = 0.85f)
+                                        Color.Black.copy(alpha = 0.5f),
+                                        Color.Black.copy(alpha = 0.92f)
                                     ),
-                                    startY = 80f
+                                    startY = 60f
                                 )
                             )
                     )
 
-                    // Content overlay
+                    // Konten teks informasi film
                     Column(
                         modifier = Modifier
                             .align(Alignment.BottomStart)
                             .padding(16.dp)
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.Star,
-                                contentDescription = "Rating",
-                                tint = Color(0xFFFFC107),
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = String.format(Locale.getDefault(), "%.1f", movie.voteAverage ?: 0.0),
-                                style = MaterialTheme.typography.labelLarge,
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold
-                            )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            // Rating bintang
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.Star,
+                                    contentDescription = "Rating",
+                                    tint = StarGold,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = String.format(Locale.getDefault(), "%.1f", movie.voteAverage ?: 0.0),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+
+                            // Badge tahun rilis
+                            val year = movie.releaseDate?.take(4) ?: ""
+                            if (year.isNotBlank()) {
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(Color.White.copy(alpha = 0.25f))
+                                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                                ) {
+                                    Text(
+                                        text = year,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = Color.White,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
+                            }
                         }
-                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
                         Text(
                             text = movie.title,
                             style = MaterialTheme.typography.titleLarge,
@@ -282,9 +316,9 @@ fun HeroCarousel(
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-        // Pager indicators
+        // Indikator halaman yang memanjang secara halus (animated pill indicator)
         Row(
             Modifier
                 .fillMaxWidth()
@@ -292,23 +326,30 @@ fun HeroCarousel(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            repeat(trendingMovies.size.coerceAtMost(7)) { iteration ->
-                val color = if (pagerState.currentPage % 7 == iteration) {
+            repeat(displayCount) { iteration ->
+                val isSelected = pagerState.currentPage == iteration
+                val indicatorWidth by animateDpAsState(
+                    targetValue = if (isSelected) 22.dp else 7.dp,
+                    label = "indicator_width"
+                )
+                val indicatorColor = if (isSelected) {
                     MaterialTheme.colorScheme.primary
                 } else {
-                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)
                 }
+
                 Box(
                     modifier = Modifier
-                        .padding(2.dp)
+                        .padding(horizontal = 3.dp)
                         .clip(CircleShape)
-                        .background(color)
-                        .size(8.dp)
+                        .background(indicatorColor)
+                        .size(width = indicatorWidth, height = 7.dp)
                 )
             }
         }
     }
 }
+
 
 @Composable
 fun CountryFilterSection(
