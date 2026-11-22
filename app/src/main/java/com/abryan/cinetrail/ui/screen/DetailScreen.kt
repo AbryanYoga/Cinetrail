@@ -51,7 +51,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.abryan.cinetrail.R
 import com.abryan.cinetrail.ui.component.DetailLoadingSkeleton
@@ -322,7 +324,7 @@ fun DetailScreen(
 
                         Spacer(modifier = Modifier.height(20.dp))
 
-                        // Overview (Sinopsis)
+                        // Overview (Sinopsis Film)
                         Text(
                             text = stringResource(id = R.string.overview),
                             style = MaterialTheme.typography.titleLarge,
@@ -332,15 +334,22 @@ fun DetailScreen(
 
                         Spacer(modifier = Modifier.height(8.dp))
 
+                        val overviewText = if (!detail.overview.isNullOrBlank()) {
+                            detail.overview
+                        } else {
+                            stringResource(id = R.string.no_results)
+                        }
+
                         Text(
-                            text = detail.overview ?: stringResource(id = R.string.no_results),
+                            text = overviewText,
                             style = MaterialTheme.typography.bodyLarge,
+                            lineHeight = 24.sp,
                             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.85f)
                         )
 
                         Spacer(modifier = Modifier.height(24.dp))
 
-                        // Watch Providers Section
+                        // Bagian Tempat Nonton (Watch Providers)
                         Text(
                             text = "${stringResource(id = R.string.region)}: ${uiState.selectedRegion}",
                             style = MaterialTheme.typography.titleMedium,
@@ -348,7 +357,7 @@ fun DetailScreen(
                             color = MaterialTheme.colorScheme.onBackground
                         )
 
-                        Spacer(modifier = Modifier.height(6.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         val regions = listOf(
                             "ID" to "Indonesia",
@@ -383,18 +392,34 @@ fun DetailScreen(
                             }
                         }
 
-
                         Spacer(modifier = Modifier.height(8.dp))
 
                         WatchProvidersSection(watchProviderRegion = uiState.watchProviderRegion)
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(28.dp))
 
-                        Text(
-                            text = stringResource(id = R.string.tmdb_attribution),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
-                        )
+                        // Kartu Atribusi Resmi TMDB & JustWatch
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(14.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.tmdb_attribution),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
 
                         Spacer(modifier = Modifier.height(24.dp))
                     }
@@ -403,3 +428,4 @@ fun DetailScreen(
         }
     }
 }
+
