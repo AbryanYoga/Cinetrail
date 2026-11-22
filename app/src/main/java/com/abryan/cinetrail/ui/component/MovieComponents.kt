@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BrokenImage
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
@@ -368,10 +369,35 @@ fun CountryFilterSection(
             FilterChip(
                 selected = selected,
                 onClick = { onCountrySelected(option.code) },
-                label = { Text(text = stringResource(id = option.labelResId)) },
+                label = {
+                    Text(
+                        text = stringResource(id = option.labelResId),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                    )
+                },
+                leadingIcon = if (selected) {
+                    {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                } else null,
+                shape = RoundedCornerShape(10.dp),
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MaterialTheme.colorScheme.primary,
-                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = selected,
+                    borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                    selectedBorderColor = MaterialTheme.colorScheme.primary
                 )
             )
         }
@@ -395,10 +421,35 @@ fun GenreFilterSection(
             FilterChip(
                 selected = selected,
                 onClick = { onGenreSelected(null) },
-                label = { Text(text = stringResource(id = R.string.all_genres)) },
+                label = {
+                    Text(
+                        text = stringResource(id = R.string.all_genres),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                    )
+                },
+                leadingIcon = if (selected) {
+                    {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                } else null,
+                shape = RoundedCornerShape(10.dp),
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MaterialTheme.colorScheme.secondary,
-                    selectedLabelColor = MaterialTheme.colorScheme.onSecondary
+                    selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    selectedLeadingIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = selected,
+                    borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                    selectedBorderColor = MaterialTheme.colorScheme.secondary
                 )
             )
         }
@@ -408,15 +459,41 @@ fun GenreFilterSection(
             FilterChip(
                 selected = selected,
                 onClick = { onGenreSelected(if (selected) null else genre.id) },
-                label = { Text(text = genre.name) },
+                label = {
+                    Text(
+                        text = genre.name,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                    )
+                },
+                leadingIcon = if (selected) {
+                    {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                } else null,
+                shape = RoundedCornerShape(10.dp),
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MaterialTheme.colorScheme.secondary,
-                    selectedLabelColor = MaterialTheme.colorScheme.onSecondary
+                    selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    selectedLeadingIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = selected,
+                    borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                    selectedBorderColor = MaterialTheme.colorScheme.secondary
                 )
             )
         }
     }
 }
+
 
 @Composable
 fun LoadingState(modifier: Modifier = Modifier) {
