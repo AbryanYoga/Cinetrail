@@ -25,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -198,77 +199,126 @@ fun DetailScreen(
 
                                 Spacer(modifier = Modifier.height(8.dp))
 
-                                // Rating & Duration
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Default.Star,
-                                        contentDescription = null,
-                                        tint = StarGold,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = String.format(Locale.getDefault(), "%.1f", detail.voteAverage ?: 0.0),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onBackground
-                                    )
+                                // Rating & Durasi
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Default.Star,
+                                            contentDescription = "Rating",
+                                            tint = StarGold,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = String.format(Locale.getDefault(), "%.1f", detail.voteAverage ?: 0.0),
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onBackground
+                                        )
+                                    }
 
                                     detail.runtime?.let { runtime ->
                                         if (runtime > 0) {
-                                            Spacer(modifier = Modifier.width(16.dp))
-                                            Icon(
-                                                imageVector = Icons.Default.AccessTime,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                                                modifier = Modifier.size(18.dp)
-                                            )
-                                            Spacer(modifier = Modifier.width(4.dp))
-                                            Text(
-                                                text = "$runtime ${stringResource(id = R.string.minutes)}",
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-                                            )
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Icon(
+                                                    imageVector = Icons.Default.AccessTime,
+                                                    contentDescription = null,
+                                                    tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                                                    modifier = Modifier.size(16.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                val durationText = if (runtime >= 60) {
+                                                    "${runtime / 60}j ${runtime % 60}m"
+                                                } else {
+                                                    "$runtime ${stringResource(id = R.string.minutes)}"
+                                                }
+                                                Text(
+                                                    text = durationText,
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.75f)
+                                                )
+                                            }
                                         }
                                     }
                                 }
 
                                 Spacer(modifier = Modifier.height(8.dp))
 
-                                detail.releaseDate?.take(4)?.let { year ->
-                                    Text(
-                                        text = "${stringResource(id = R.string.release_date)}: $year",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-                                    )
+                                // Tanggal rilis & negara asal
+                                detail.releaseDate?.let { date ->
+                                    if (date.isNotBlank()) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(
+                                                imageVector = Icons.Default.DateRange,
+                                                contentDescription = null,
+                                                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text(
+                                                text = "${stringResource(id = R.string.release_date)}: $date",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.75f)
+                                            )
+                                        }
+                                    }
+                                }
+
+                                // Badge Negara Asal jika tersedia
+                                detail.originCountry?.let { countries ->
+                                    if (countries.isNotEmpty()) {
+                                        Spacer(modifier = Modifier.height(6.dp))
+                                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                            countries.take(3).forEach { countryCode ->
+                                                Box(
+                                                    modifier = Modifier
+                                                        .clip(RoundedCornerShape(6.dp))
+                                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                                                ) {
+                                                    Text(
+                                                        text = countryCode,
+                                                        style = MaterialTheme.typography.labelSmall,
+                                                        fontWeight = FontWeight.SemiBold,
+                                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Genres chips
+                        // Chips Genre dengan desain kontras dan padding yang pas
                         detail.genres?.let { genreList ->
                             FlowRow(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 genreList.forEach { genre ->
                                     Box(
                                         modifier = Modifier
-                                            .clip(RoundedCornerShape(12.dp))
+                                            .clip(RoundedCornerShape(10.dp))
                                             .background(MaterialTheme.colorScheme.primaryContainer)
                                             .padding(horizontal = 12.dp, vertical = 6.dp)
                                     ) {
                                         Text(
                                             text = genre.name,
                                             style = MaterialTheme.typography.labelMedium,
+                                            fontWeight = FontWeight.SemiBold,
                                             color = MaterialTheme.colorScheme.onPrimaryContainer
                                         )
                                     }
                                 }
                             }
                         }
+
 
                         Spacer(modifier = Modifier.height(20.dp))
 
