@@ -23,6 +23,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -53,6 +55,7 @@ import com.abryan.cinetrail.ui.component.LoadingState
 import com.abryan.cinetrail.ui.component.MovieCard
 import com.abryan.cinetrail.viewmodel.COUNTRY_OPTIONS
 import com.abryan.cinetrail.viewmodel.DashboardViewModel
+import com.abryan.cinetrail.viewmodel.MovieCategory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -215,26 +218,58 @@ fun DashboardScreen(
                     }
                 }
 
-                // Section Header for Popular Movies
+                // Pengalih Kategori Film (Populer vs Rating Tertinggi)
                 item {
-                    Text(
-                        text = stringResource(id = R.string.popular_movies),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        FilterChip(
+                            selected = uiState.selectedCategory == MovieCategory.POPULAR,
+                            onClick = { viewModel.selectCategory(MovieCategory.POPULAR) },
+                            label = {
+                                Text(
+                                    text = stringResource(id = R.string.popular_movies),
+                                    fontWeight = if (uiState.selectedCategory == MovieCategory.POPULAR) FontWeight.Bold else FontWeight.Medium
+                                )
+                            },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        )
+
+                        FilterChip(
+                            selected = uiState.selectedCategory == MovieCategory.TOP_RATED,
+                            onClick = { viewModel.selectCategory(MovieCategory.TOP_RATED) },
+                            label = {
+                                Text(
+                                    text = stringResource(id = R.string.top_rated),
+                                    fontWeight = if (uiState.selectedCategory == MovieCategory.TOP_RATED) FontWeight.Bold else FontWeight.Medium
+                                )
+                            },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        )
+                    }
                 }
 
-                // Content state
-                if (uiState.isLoading && uiState.popularMovies.isEmpty()) {
+                // Status Konten (Loading Skeleton / Error / Empty / List Film)
+                if (uiState.isLoading && uiState.displayedMovies.isEmpty()) {
                     item { LoadingState() }
-                } else if (uiState.isError && uiState.popularMovies.isEmpty()) {
+                } else if (uiState.isError && uiState.displayedMovies.isEmpty()) {
                     item { ErrorState(onRetry = { viewModel.loadData() }) }
-                } else if (uiState.popularMovies.isEmpty()) {
+                } else if (uiState.displayedMovies.isEmpty()) {
                     item { EmptyState() }
                 } else {
-                    items(uiState.popularMovies) { movie ->
+                    items(uiState.displayedMovies) { movie ->
                         MovieCard(
                             movie = movie,
                             genresMap = uiState.genresMap,
@@ -243,6 +278,7 @@ fun DashboardScreen(
                         )
                     }
                 }
+
             }
         }
     }

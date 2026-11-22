@@ -497,15 +497,68 @@ fun GenreFilterSection(
 
 @Composable
 fun LoadingState(modifier: Modifier = Modifier) {
-    Box(
+    Column(
         modifier = modifier
             .fillMaxWidth()
-            .height(200.dp),
-        contentAlignment = Alignment.Center
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+        repeat(3) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(130.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .width(88.dp)
+                            .aspectRatio(2f / 3f)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(0.7f)
+                                .height(18.dp)
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
+                        )
+                        Box(
+                            modifier = Modifier
+                                .width(70.dp)
+                                .height(14.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f))
+                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(0.45f)
+                                .height(14.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f))
+                        )
+                    }
+                }
+            }
+        }
     }
 }
+
 
 @Composable
 fun ErrorState(
