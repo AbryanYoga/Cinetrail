@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Cinetrail</string>
+    <string name="search_placeholder">Search movies…</string>
+    <string name="trending_now">Trending This Week</string>
+    <string name="popular_movies">Popular Movies</string>
+    <string name="top_rated">Top Rated</string>
+    <string name="all_countries">All Countries</string>
+    <string name="all_genres">All Genres</string>
+    <string name="country_us">USA</string>
+    <string name="country_id">Indonesia</string>
+    <string name="country_kr">South Korea</string>
+    <string name="country_jp">Japan</string>
+    <string name="country_in">India</string>
+    <string name="country_gb">UK</string>
+    <string name="overview">Overview</string>
+    <string name="watch_providers">Where to Watch</string>
+    <string name="streaming">Streaming</string>
+    <string name="rent">Rent</string>
+    <string name="buy">Buy</string>
+    <string name="not_available">Not available in selected region</string>
+    <string name="justwatch_attribution">Watch provider data provided by JustWatch</string>
+    <string name="tmdb_attribution">This product uses the TMDB API but is not endorsed or certified by TMDB.</string>
+    <string name="retry">Try Again</string>
+    <string name="error_occurred">An error occurred while loading data.</string>
+    <string name="no_results">No movies found</string>
+    <string name="language">Language</string>
+    <string name="select_language">Choose Language</string>
+    <string name="english">English</string>
+    <string name="indonesian">Indonesian</string>
+    <string name="release_date">Release Date</string>
+    <string name="rating">Rating</string>
+    <string name="duration">Duration</string>
+    <string name="minutes">min</string>
+    <string name="region">Region</string>
+    <string name="back">Back</string>
+</resources>

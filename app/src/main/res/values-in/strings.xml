@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Cinetrail</string>
+    <string name="search_placeholder">Cari film…</string>
+    <string name="trending_now">Trending Minggu Ini</string>
+    <string name="popular_movies">Film Populer</string>
+    <string name="top_rated">Rating Tertinggi</string>
+    <string name="all_countries">Semua Negara</string>
+    <string name="all_genres">Semua Genre</string>
+    <string name="country_us">Amerika Serikat</string>
+    <string name="country_id">Indonesia</string>
+    <string name="country_kr">Korea Selatan</string>
+    <string name="country_jp">Jepang</string>
+    <string name="country_in">India</string>
+    <string name="country_gb">Inggris</string>
+    <string name="overview">Sinopsis</string>
+    <string name="watch_providers">Tempat Nonton</string>
+    <string name="streaming">Streaming</string>
+    <string name="rent">Sewa</string>
+    <string name="buy">Beli</string>
+    <string name="not_available">Belum tersedia di wilayah ini</string>
+    <string name="justwatch_attribution">Data tempat nonton disediakan oleh JustWatch</string>
+    <string name="tmdb_attribution">Produk ini menggunakan API TMDB tetapi tidak didukung atau disertifikasi oleh TMDB.</string>
+    <string name="retry">Coba Lagi</string>
+    <string name="error_occurred">Terjadi kesalahan saat memuat data.</string>
+    <string name="no_results">Film tidak ditemukan</string>
+    <string name="language">Bahasa</string>
+    <string name="select_language">Pilih Bahasa</string>
+    <string name="english">Bahasa Inggris</string>
+    <string name="indonesian">Bahasa Indonesia</string>
+    <string name="release_date">Tanggal Rilis</string>
+    <string name="rating">Rating</string>
+    <string name="duration">Durasi</string>
+    <string name="minutes">menit</string>
+    <string name="region">Wilayah</string>
+    <string name="back">Kembali</string>
+</resources>
