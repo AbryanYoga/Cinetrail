@@ -618,45 +618,57 @@ fun EmptyState(
 fun WatchProviderGroup(
     title: String,
     providers: List<WatchProviderDto>,
+    accentColor: Color = MaterialTheme.colorScheme.primary,
     modifier: Modifier = Modifier
 ) {
     if (providers.isEmpty()) return
 
-    Column(modifier = modifier.padding(vertical = 6.dp)) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Spacer(modifier = Modifier.height(6.dp))
+    Column(modifier = modifier.padding(vertical = 8.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .background(accentColor)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = accentColor
+            )
+        }
+        Spacer(modifier = Modifier.height(10.dp))
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             providers.forEach { provider ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .padding(horizontal = 8.dp, vertical = 6.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(horizontal = 10.dp, vertical = 8.dp)
                 ) {
                     val logoUrl = provider.getFullLogoUrl()
                     if (logoUrl != null) {
                         AsyncImage(
                             model = logoUrl,
                             contentDescription = provider.providerName,
+                            contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .size(28.dp)
-                                .clip(RoundedCornerShape(6.dp))
+                                .size(32.dp)
+                                .clip(RoundedCornerShape(8.dp))
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(10.dp))
                     }
                     Text(
                         text = provider.providerName,
                         style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -672,7 +684,9 @@ fun WatchProvidersSection(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
@@ -689,33 +703,45 @@ fun WatchProvidersSection(
                  watchProviderRegion.rent.isNullOrEmpty() &&
                  watchProviderRegion.buy.isNullOrEmpty())
             ) {
-                Text(
-                    text = stringResource(id = R.string.not_available),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.not_available),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+                }
             } else {
                 watchProviderRegion.flatrate?.let {
                     WatchProviderGroup(
                         title = stringResource(id = R.string.streaming),
-                        providers = it
+                        providers = it,
+                        accentColor = MaterialTheme.colorScheme.primary
                     )
                 }
                 watchProviderRegion.rent?.let {
                     WatchProviderGroup(
                         title = stringResource(id = R.string.rent),
-                        providers = it
+                        providers = it,
+                        accentColor = MaterialTheme.colorScheme.secondary
                     )
                 }
                 watchProviderRegion.buy?.let {
                     WatchProviderGroup(
                         title = stringResource(id = R.string.buy),
-                        providers = it
+                        providers = it,
+                        accentColor = MaterialTheme.colorScheme.tertiary
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             Text(
                 text = stringResource(id = R.string.justwatch_attribution),
@@ -725,3 +751,4 @@ fun WatchProvidersSection(
         }
     }
 }
+

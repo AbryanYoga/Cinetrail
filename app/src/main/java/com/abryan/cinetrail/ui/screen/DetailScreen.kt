@@ -350,23 +350,39 @@ fun DetailScreen(
 
                         Spacer(modifier = Modifier.height(6.dp))
 
-                        val regions = listOf("ID", "US", "SG", "JP", "KR", "GB")
+                        val regions = listOf(
+                            "ID" to "Indonesia",
+                            "US" to "USA",
+                            "SG" to "Singapore",
+                            "JP" to "Japan",
+                            "KR" to "Korea",
+                            "GB" to "UK"
+                        )
                         LazyRow(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             contentPadding = PaddingValues(bottom = 8.dp)
                         ) {
-                            items(regions) { reg ->
+                            items(regions) { (code, name) ->
+                                val selected = uiState.selectedRegion == code
                                 FilterChip(
-                                    selected = uiState.selectedRegion == reg,
-                                    onClick = { viewModel.changeRegion(reg, movieId) },
-                                    label = { Text(text = reg) },
+                                    selected = selected,
+                                    onClick = { viewModel.changeRegion(code, movieId) },
+                                    label = {
+                                        Text(
+                                            text = "$code ($name)",
+                                            style = MaterialTheme.typography.labelMedium,
+                                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                                        )
+                                    },
+                                    shape = RoundedCornerShape(10.dp),
                                     colors = FilterChipDefaults.filterChipColors(
-                                        selectedContainerColor = MaterialTheme.colorScheme.tertiary,
-                                        selectedLabelColor = MaterialTheme.colorScheme.onTertiary
+                                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
                                     )
                                 )
                             }
                         }
+
 
                         Spacer(modifier = Modifier.height(8.dp))
 
