@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -55,6 +56,7 @@ import com.abryan.cinetrail.R
 import com.abryan.cinetrail.ui.component.ErrorState
 import com.abryan.cinetrail.ui.component.LoadingState
 import com.abryan.cinetrail.ui.component.WatchProvidersSection
+import com.abryan.cinetrail.ui.theme.StarGold
 import com.abryan.cinetrail.viewmodel.DetailViewModel
 import java.util.Locale
 
@@ -75,12 +77,27 @@ fun DetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = uiState.movieDetail?.title ?: "") },
+                title = {
+                    Text(
+                        text = uiState.movieDetail?.title ?: "",
+                        maxLines = 1,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
-                    IconButton(onClick = onBackClick) {
+                    IconButton(
+                        onClick = onBackClick,
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.75f))
+                            .size(40.dp)
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.back)
+                            contentDescription = stringResource(id = R.string.back),
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },
@@ -111,11 +128,11 @@ fun DetailScreen(
                         .fillMaxSize()
                         .verticalScroll(scrollState)
                 ) {
-                    // Backdrop Header
+                    // Header Sampul Film (Backdrop) dengan transisi gradien halus
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(240.dp)
+                            .height(250.dp)
                     ) {
                         AsyncImage(
                             model = detail.getFullBackdropUrl() ?: detail.getFullPosterUrl(),
@@ -124,7 +141,7 @@ fun DetailScreen(
                             modifier = Modifier.fillMaxSize()
                         )
 
-                        // Gradient transition
+                        // Gradien transisi ke latar belakang aplikasi
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -132,13 +149,15 @@ fun DetailScreen(
                                     Brush.verticalGradient(
                                         colors = listOf(
                                             Color.Transparent,
+                                            Color.Black.copy(alpha = 0.3f),
                                             MaterialTheme.colorScheme.background
                                         ),
-                                        startY = 100f
+                                        startY = 70f
                                     )
                                 )
                         )
                     }
+
 
                     // Content details
                     Column(
@@ -184,7 +203,7 @@ fun DetailScreen(
                                     Icon(
                                         imageVector = Icons.Default.Star,
                                         contentDescription = null,
-                                        tint = Color(0xFFFFC107),
+                                        tint = StarGold,
                                         modifier = Modifier.size(18.dp)
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
