@@ -10,6 +10,8 @@ import com.abryan.cinetrail.data.model.MovieDto
 import com.abryan.cinetrail.data.model.WatchProviderRegion
 import com.abryan.cinetrail.data.repository.MovieRepository
 import com.abryan.cinetrail.ui.component.CountryOption
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -225,20 +227,35 @@ class SearchViewModel(
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
+    private var searchJob: Job? = null
+
     fun onQueryChange(newQuery: String, language: String) {
         _uiState.value = _uiState.value.copy(query = newQuery)
+        searchJob?.cancel()
         if (newQuery.isBlank()) {
-            _uiState.value = _uiState.value.copy(searchResults = emptyList(), isLoading = false)
+            _uiState.value = _uiState.value.copy(
+                searchResults = emptyList(),
+                isLoading = false,
+                isError = false
+            )
             return
         }
 
-        viewModelScope.launch {
+        searchJob = viewModelScope.launch {
+            delay(350) // Debounce 350ms untuk efisiensi request ke API
             _uiState.value = _uiState.value.copy(isLoading = true, isError = false)
-            val results = repository.searchMovies(newQuery, language)
-            _uiState.value = _uiState.value.copy(
-                isLoading = false,
-                searchResults = results
-            )
+            try {
+                val results = repository.searchMovies(newQuery.trim(), language)
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    searchResults = results
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    isError = true
+                )
+            }
         }
     }
 }
