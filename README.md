@@ -14,11 +14,14 @@ Aplikasi ini dikembangkan oleh **Abryan Yoga Pratama** sebagai tugas proyek Pemr
   - Daftar film populer dan rating tertinggi disajikan dalam bentuk kartu interaktif (`LazyColumn`).
 - **Pencarian Film**: Cari film berdasarkan kata kunci dengan pencarian cepat.
 - **Detail Film Lengkap**:
-  - Gambar sampul (*backdrop*) dan poster film berkualitas tinggi.
-  - Rating, durasi, tanggal rilis, dan genre film.
-  - Sinopsis lengkap dengan dukungan fallback bahasa Inggris jika sinopsis versi lokal kosong.
+  - Tampilan hero *backdrop* sinematik dengan pemutar cuplikan/trailer YouTube dan penanda durasi.
+  - Badge informasi cepat: Usia/Rating Sensor (+18/13+), Genre Utama, Rating Bintang Emas, serta tombol Favorit.
+  - Sinopsis interaktif dengan pembacaan dinamis (*Show More / Show Less*).
+  - Daftar pemeran utama (*Actors*) lengkap dengan foto aktor dan nama karakter dalam film.
+  - Dukungan fallback bahasa Inggris jika sinopsis versi lokal kosong.
 - **Tempat Nonton (Watch Providers)**:
   - Menampilkan platform streaming, tempat sewa, dan tempat beli film berdasarkan wilayah pilihan (ID, US, SG, JP, KR, GB).
+  - Tombol aksi utama untuk langsung membuka tautan resmi penyedia tayangan.
   - Dilengkapi logo resmi provider dan atribusi JustWatch.
 - **Multi Bahasa (ID & EN)**:
   - Aplikasi mendukung Bahasa Indonesia dan Bahasa Inggris secara penuh (UI dan data TMDB).
