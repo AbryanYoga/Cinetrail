@@ -300,36 +300,71 @@ fun LanguageDialog(
     onLanguageSelected: (String) -> Unit
 ) {
     val languages = listOf(
-        "en-US" to stringResource(id = R.string.english),
-        "id-ID" to stringResource(id = R.string.indonesian)
+        Triple("id-ID", stringResource(id = R.string.indonesian), "🇮🇩"),
+        Triple("en-US", stringResource(id = R.string.english), "🇺🇸")
     )
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(id = R.string.select_language)) },
+        shape = RoundedCornerShape(20.dp),
+        title = {
+            Text(
+                text = stringResource(id = R.string.select_language),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+        },
         text = {
-            Column {
-                languages.forEach { (code, name) ->
-                    Row(
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                languages.forEach { (code, name, flag) ->
+                    val isSelected = currentLanguage == code
+                    Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onLanguageSelected(code) }
-                            .padding(vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = currentLanguage == code,
-                            onClick = { onLanguageSelected(code) }
+                            .clickable { onLanguageSelected(code) },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (isSelected) {
+                                MaterialTheme.colorScheme.primaryContainer
+                            } else {
+                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                            }
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text(text = name, style = MaterialTheme.typography.bodyLarge)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 14.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = flag, style = MaterialTheme.typography.titleLarge)
+                            Spacer(modifier = Modifier.width(14.dp))
+                            Text(
+                                text = name,
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                color = if (isSelected) {
+                                    MaterialTheme.colorScheme.onPrimaryContainer
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface
+                                },
+                                modifier = Modifier.weight(1f)
+                            )
+                            RadioButton(
+                                selected = isSelected,
+                                onClick = { onLanguageSelected(code) }
+                            )
+                        }
                     }
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = stringResource(id = android.R.string.cancel))
+                Text(
+                    text = stringResource(id = R.string.close),
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     )
