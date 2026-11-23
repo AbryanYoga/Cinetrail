@@ -12,7 +12,10 @@ Aplikasi ini dikembangkan oleh **Abryan Yoga Pratama** sebagai tugas proyek Pemr
   - Carousel film *Trending Minggu Ini* dengan indikator interaktif.
   - Filter cepat berdasarkan **Negara** (Semua, Indonesia, Amerika Serikat, Korea Selatan, Jepang, India, Inggris) dan **Genre**.
   - Daftar film populer dan rating tertinggi disajikan dalam bentuk kartu interaktif (`LazyColumn`).
-- **Pencarian Film**: Cari film berdasarkan kata kunci dengan pencarian cepat.
+- **Pencarian Film Cerdas & Real-time**:
+  - Kolom pencarian responsif dengan *debouncing* 350ms dan pembatalan coroutine untuk efisiensi jaringan.
+  - Tombol hapus pencarian (*clear button*) satu sentuhan.
+  - Panduan pencarian interaktif saat kolom kosong dan hasil pencarian lengkap dengan *badge* genre film.
 - **Detail Film Lengkap**:
   - Tampilan hero *backdrop* sinematik dengan pemutar cuplikan/trailer YouTube dan penanda durasi.
   - Badge informasi cepat: Usia/Rating Sensor (+18/13+), Genre Utama, Rating Bintang Emas, serta tombol Favorit.
@@ -25,10 +28,10 @@ Aplikasi ini dikembangkan oleh **Abryan Yoga Pratama** sebagai tugas proyek Pemr
   - Dilengkapi logo resmi provider dan atribusi JustWatch.
 - **Multi Bahasa (ID & EN)**:
   - Aplikasi mendukung Bahasa Indonesia dan Bahasa Inggris secara penuh (UI dan data TMDB).
-  - Dapat diganti langsung dari menu header tanpa perlu mengubah bahasa perangkat.
-- **Dukungan Dark Mode & Rotasi Layar**:
-  - Menggunakan komponen **Material 3** yang menyesuaikan mode gelap (Night mode) secara otomatis.
-  - Tampilan yang adaptif saat layar diputar (*portrait* & *landscape*).
+  - Dialog seleksi bahasa interaktif dengan bendera negara dan pergantian instan menggunakan `AppCompatDelegate.setApplicationLocales`.
+- **Dukungan Penuh Dark / Light Mode & Rotasi Layar**:
+  - Menggunakan palet **Material 3** (Cinematic Amber & Deep Obsidian) tanpa *hardcode* warna, sehingga tampilan Night & Not Night mode tampil sempurna.
+  - Adaptabilitas tata letak saat rotasi layar (*portrait* & *landscape*) menggunakan `LazyColumn` dan `verticalScroll` sehingga bebas *clipping* dan tetap dapat digulirkan secara lancar.
 
 ---
 
