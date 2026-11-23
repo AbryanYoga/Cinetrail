@@ -1,15 +1,16 @@
 package com.abryan.cinetrail.ui.screen
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,9 +25,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,25 +42,29 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.abryan.cinetrail.R
+import com.abryan.cinetrail.data.model.CastDto
 import com.abryan.cinetrail.ui.component.DetailLoadingSkeleton
 import com.abryan.cinetrail.ui.component.ErrorState
 import com.abryan.cinetrail.ui.component.WatchProvidersSection
@@ -72,43 +81,14 @@ fun DetailScreen(
     onBackClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(movieId, currentLanguage) {
         viewModel.loadMovieDetails(movieId, currentLanguage)
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = uiState.movieDetail?.title ?: "",
-                        maxLines = 1,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = onBackClick,
-                        modifier = Modifier
-                            .padding(start = 8.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.75f))
-                            .size(40.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.back),
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
-                )
-            )
-        }
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -125,17 +105,18 @@ fun DetailScreen(
             } else {
                 val detail = uiState.movieDetail!!
                 val scrollState = rememberScrollState()
+                var isSynopsisExpanded by remember { mutableStateOf(false) }
 
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(scrollState)
                 ) {
-                    // Header Sampul Film (Backdrop) dengan transisi gradien halus
+                    // Header Sampul Film (Backdrop) sinematik dengan pemutar trailer
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(250.dp)
+                            .height(340.dp)
                     ) {
                         AsyncImage(
                             model = detail.getFullBackdropUrl() ?: detail.getFullPosterUrl(),
@@ -144,214 +125,264 @@ fun DetailScreen(
                             modifier = Modifier.fillMaxSize()
                         )
 
-                        // Gradien transisi ke latar belakang aplikasi
+                        // Gradien transisi atas & bawah ke latar belakang
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .background(
                                     Brush.verticalGradient(
                                         colors = listOf(
+                                            Color.Black.copy(alpha = 0.6f),
                                             Color.Transparent,
-                                            Color.Black.copy(alpha = 0.3f),
+                                            Color.Transparent,
                                             MaterialTheme.colorScheme.background
-                                        ),
-                                        startY = 70f
+                                        )
                                     )
                                 )
                         )
+
+                        // Bilah Aksi Atas (Kembali & Bagikan)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 12.dp)
+                                .align(Alignment.TopCenter),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            IconButton(
+                                onClick = onBackClick,
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .background(Color.Black.copy(alpha = 0.45f))
+                                    .size(40.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = stringResource(id = R.string.back),
+                                    tint = Color.White
+                                )
+                            }
+
+                            IconButton(
+                                onClick = {
+                                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                        type = "text/plain"
+                                        putExtra(Intent.EXTRA_SUBJECT, detail.title)
+                                        putExtra(
+                                            Intent.EXTRA_TEXT,
+                                            "${detail.title} - Cinetrail\nhttps://www.themoviedb.org/movie/$movieId"
+                                        )
+                                    }
+                                    context.startActivity(Intent.createChooser(shareIntent, detail.title))
+                                },
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .background(Color.Black.copy(alpha = 0.45f))
+                                    .size(40.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Share,
+                                    contentDescription = stringResource(id = R.string.share),
+                                    tint = Color.White
+                                )
+                            }
+                        }
+
+                        // Tombol Putar Trailer Tengah (Aksen Merah sesuai referensi)
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(56.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFE50914))
+                                .clickable {
+                                    val trailerUrl = "https://www.youtube.com/results?search_query=${Uri.encode(detail.title + " trailer")}"
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(trailerUrl))
+                                    context.startActivity(intent)
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.PlayArrow,
+                                contentDescription = "Play Trailer",
+                                tint = Color.White,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+
+                        // Durasi Film di sudut kanan bawah backdrop
+                        detail.runtime?.let { runtime ->
+                            if (runtime > 0) {
+                                val durationText = if (runtime >= 60) "${runtime / 60}h ${runtime % 60}min" else "${runtime}m"
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomEnd)
+                                        .padding(16.dp)
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(Color.Black.copy(alpha = 0.65f))
+                                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        text = durationText,
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = Color.White
+                                    )
+                                }
+                            }
+                        }
                     }
 
-
-                    // Content details
+                    // Konten Detail Informasi Film
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
                     ) {
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Baris Badge Metadata (+18 / Usia, Genre Utama, Rating, dan Ikon Favorit)
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.Top
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // Poster image
-                            Card(
-                                shape = RoundedCornerShape(12.dp),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                            val ageRating = if (detail.adult == true) "+18" else "13+"
+                            Box(
                                 modifier = Modifier
-                                    .width(110.dp)
-                                    .aspectRatio(2f / 3f)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
+                                    .padding(horizontal = 10.dp, vertical = 6.dp)
                             ) {
-                                AsyncImage(
-                                    model = detail.getFullPosterUrl(),
-                                    contentDescription = detail.title,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier.fillMaxSize()
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.width(16.dp))
-
-                            // Metadata
-                            Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = detail.title,
-                                    style = MaterialTheme.typography.headlineSmall,
+                                    text = ageRating,
+                                    style = MaterialTheme.typography.labelMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onBackground
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                // Rating & Durasi
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            imageVector = Icons.Default.Star,
-                                            contentDescription = "Rating",
-                                            tint = StarGold,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(4.dp))
-                                        Text(
-                                            text = String.format(Locale.getDefault(), "%.1f", detail.voteAverage ?: 0.0),
-                                            style = MaterialTheme.typography.titleMedium,
-                                            fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.onBackground
-                                        )
-                                    }
-
-                                    detail.runtime?.let { runtime ->
-                                        if (runtime > 0) {
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Icon(
-                                                    imageVector = Icons.Default.AccessTime,
-                                                    contentDescription = null,
-                                                    tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                                                    modifier = Modifier.size(16.dp)
-                                                )
-                                                Spacer(modifier = Modifier.width(4.dp))
-                                                val durationText = if (runtime >= 60) {
-                                                    "${runtime / 60}j ${runtime % 60}m"
-                                                } else {
-                                                    "$runtime ${stringResource(id = R.string.minutes)}"
-                                                }
-                                                Text(
-                                                    text = durationText,
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.75f)
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                // Tanggal rilis & negara asal
-                                detail.releaseDate?.let { date ->
-                                    if (date.isNotBlank()) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(
-                                                imageVector = Icons.Default.DateRange,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                                                modifier = Modifier.size(16.dp)
-                                            )
-                                            Spacer(modifier = Modifier.width(4.dp))
-                                            Text(
-                                                text = "${stringResource(id = R.string.release_date)}: $date",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.75f)
-                                            )
-                                        }
-                                    }
-                                }
-
-                                // Badge Negara Asal jika tersedia
-                                detail.originCountry?.let { countries ->
-                                    if (countries.isNotEmpty()) {
-                                        Spacer(modifier = Modifier.height(6.dp))
-                                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                            countries.take(3).forEach { countryCode ->
-                                                Box(
-                                                    modifier = Modifier
-                                                        .clip(RoundedCornerShape(6.dp))
-                                                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                                                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                                                ) {
-                                                    Text(
-                                                        text = countryCode,
-                                                        style = MaterialTheme.typography.labelSmall,
-                                                        fontWeight = FontWeight.SemiBold,
-                                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
                             }
-                        }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
 
-                        // Chips Genre dengan desain kontras dan padding yang pas
-                        detail.genres?.let { genreList ->
-                            FlowRow(
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            val primaryGenre = detail.genres?.firstOrNull()?.name ?: stringResource(id = R.string.all_genres)
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
+                                    .padding(horizontal = 12.dp, vertical = 6.dp)
                             ) {
-                                genreList.forEach { genre ->
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(10.dp))
-                                            .background(MaterialTheme.colorScheme.primaryContainer)
-                                            .padding(horizontal = 12.dp, vertical = 6.dp)
-                                    ) {
-                                        Text(
-                                            text = genre.name,
-                                            style = MaterialTheme.typography.labelMedium,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                                        )
-                                    }
+                                Text(
+                                    text = primaryGenre,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
+                                    .padding(horizontal = 10.dp, vertical = 6.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Default.Star,
+                                        contentDescription = "Rating",
+                                        tint = StarGold,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = String.format(Locale.getDefault(), "%.1f", detail.voteAverage ?: 0.0),
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
                                 }
+                            }
+
+                            Spacer(modifier = Modifier.weight(1f))
+
+                            IconButton(
+                                onClick = { viewModel.toggleFavorite() }
+                            ) {
+                                Icon(
+                                    imageVector = if (uiState.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                    contentDescription = stringResource(id = R.string.favorite),
+                                    tint = if (uiState.isFavorite) Color(0xFFE50914) else MaterialTheme.colorScheme.onBackground
+                                )
                             }
                         }
 
+                        Spacer(modifier = Modifier.height(14.dp))
 
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        // Overview (Sinopsis Film)
+                        // Judul Film Utama
                         Text(
-                            text = stringResource(id = R.string.overview),
-                            style = MaterialTheme.typography.titleLarge,
+                            text = detail.title,
+                            style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onBackground
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
+                        // Sinopsis dengan teks interaktif Show More / Show Less
                         val overviewText = if (!detail.overview.isNullOrBlank()) {
                             detail.overview
                         } else {
                             stringResource(id = R.string.no_results)
                         }
 
-                        Text(
-                            text = overviewText,
-                            style = MaterialTheme.typography.bodyLarge,
-                            lineHeight = 24.sp,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.85f)
-                        )
+                        Column {
+                            Text(
+                                text = overviewText,
+                                style = MaterialTheme.typography.bodyMedium,
+                                lineHeight = 22.sp,
+                                maxLines = if (isSynopsisExpanded) Int.MAX_VALUE else 3,
+                                overflow = TextOverflow.Ellipsis,
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.85f)
+                            )
+                            if (overviewText.length > 120) {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = stringResource(id = if (isSynopsisExpanded) R.string.show_less else R.string.show_more),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFFE50914),
+                                    modifier = Modifier.clickable { isSynopsisExpanded = !isSynopsisExpanded }
+                                )
+                            }
+                        }
+
+                        // Bagian Pemeran (Actors)
+                        if (uiState.cast.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(24.dp))
+                            Text(
+                                text = stringResource(id = R.string.actors),
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            LazyRow(
+                                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                                contentPadding = PaddingValues(horizontal = 2.dp)
+                            ) {
+                                items(uiState.cast.take(15)) { cast ->
+                                    CastItem(cast = cast)
+                                }
+                            }
+                        }
 
                         Spacer(modifier = Modifier.height(24.dp))
 
                         // Bagian Tempat Nonton (Watch Providers)
                         Text(
-                            text = "${stringResource(id = R.string.region)}: ${uiState.selectedRegion}",
+                            text = "${stringResource(id = R.string.watch_movie)} (${uiState.selectedRegion})",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onBackground
@@ -396,7 +427,33 @@ fun DetailScreen(
 
                         WatchProvidersSection(watchProviderRegion = uiState.watchProviderRegion)
 
-                        Spacer(modifier = Modifier.height(28.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        // Tombol Aksi Utama (Tonton di TMDB / JustWatch)
+                        Button(
+                            onClick = {
+                                val providerUrl = uiState.watchProviderRegion?.link
+                                    ?: "https://www.themoviedb.org/movie/$movieId/watch"
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(providerUrl))
+                                context.startActivity(intent)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = StarGold,
+                                contentColor = Color.Black
+                            )
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.watch_movie),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(20.dp))
 
                         // Kartu Atribusi Resmi TMDB & JustWatch
                         Card(
@@ -429,3 +486,46 @@ fun DetailScreen(
     }
 }
 
+@Composable
+private fun CastItem(cast: CastDto) {
+    Column(
+        modifier = Modifier.width(82.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Card(
+            shape = RoundedCornerShape(10.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            modifier = Modifier
+                .width(82.dp)
+                .height(105.dp)
+        ) {
+            AsyncImage(
+                model = cast.getFullProfileUrl(),
+                contentDescription = cast.name,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+        Spacer(modifier = Modifier.height(6.dp))
+        Text(
+            text = cast.name,
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Medium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center
+        )
+        cast.character?.let { character ->
+            if (character.isNotBlank()) {
+                Text(
+                    text = character,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
+}
