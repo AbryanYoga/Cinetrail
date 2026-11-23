@@ -217,7 +217,8 @@ data class SearchUiState(
     val query: String = "",
     val isLoading: Boolean = false,
     val isError: Boolean = false,
-    val searchResults: List<MovieDto> = emptyList()
+    val searchResults: List<MovieDto> = emptyList(),
+    val genresMap: Map<Int, String> = emptyMap()
 )
 
 class SearchViewModel(
@@ -228,6 +229,16 @@ class SearchViewModel(
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
     private var searchJob: Job? = null
+
+    fun loadGenres(language: String) {
+        if (_uiState.value.genresMap.isNotEmpty()) return
+        viewModelScope.launch {
+            val genres = repository.getGenres(language)
+            _uiState.value = _uiState.value.copy(
+                genresMap = genres.associate { it.id to it.name }
+            )
+        }
+    }
 
     fun onQueryChange(newQuery: String, language: String) {
         _uiState.value = _uiState.value.copy(query = newQuery)
