@@ -40,4 +40,10 @@
     <string name="region">Wilayah</string>
     <string name="back">Kembali</string>
     <string name="close">Tutup</string>
+    <string name="actors">Pemeran</string>
+    <string name="show_more">Lebih Banyak</string>
+    <string name="show_less">Lebih Sedikit</string>
+    <string name="watch_movie">Tempat Menonton</string>
+    <string name="share">Bagikan</string>
+    <string name="favorite">Favorit</string>
 </resources>
