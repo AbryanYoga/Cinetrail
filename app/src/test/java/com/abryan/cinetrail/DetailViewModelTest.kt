@@ -193,4 +193,34 @@ class DetailViewModelTest {
         assertEquals(1, updatedState.watchProviderRegion?.rent?.size)
         assertEquals("Apple TV", updatedState.watchProviderRegion?.rent?.first()?.providerName)
     }
+
+    @Test
+    fun loadMovieDetails_populatesCastList() = runTest {
+        val fakeApi = FakeDetailTmdbService()
+        val repository = MovieRepository(fakeApi)
+        val viewModel = DetailViewModel(repository)
+
+        viewModel.loadMovieDetails(550, "id-ID")
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals(1, state.cast.size)
+        assertEquals("Leonardo DiCaprio", state.cast.first().name)
+        assertEquals("Dom Cobb", state.cast.first().character)
+    }
+
+    @Test
+    fun toggleFavorite_switchesFavoriteStateCorrectly() {
+        val fakeApi = FakeDetailTmdbService()
+        val repository = MovieRepository(fakeApi)
+        val viewModel = DetailViewModel(repository)
+
+        assertFalse(viewModel.uiState.value.isFavorite)
+
+        viewModel.toggleFavorite()
+        assertTrue(viewModel.uiState.value.isFavorite)
+
+        viewModel.toggleFavorite()
+        assertFalse(viewModel.uiState.value.isFavorite)
+    }
 }
