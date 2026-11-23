@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,10 +37,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.size
 import com.abryan.cinetrail.R
 import com.abryan.cinetrail.ui.component.EmptyState
+import com.abryan.cinetrail.ui.component.ErrorState
 import com.abryan.cinetrail.ui.component.LoadingState
 import com.abryan.cinetrail.ui.component.MovieCard
 import com.abryan.cinetrail.viewmodel.SearchViewModel
@@ -125,24 +130,57 @@ fun SearchScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            if (uiState.isLoading) {
-                LoadingState(modifier = Modifier.align(Alignment.Center))
-            } else if (uiState.query.isNotBlank() && uiState.searchResults.isEmpty()) {
-                EmptyState(
-                    message = stringResource(id = R.string.no_results),
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(uiState.searchResults) { movie ->
-                        MovieCard(
-                            movie = movie,
-                            onClick = { onMovieClick(movie.id) }
+            when {
+                uiState.isLoading -> {
+                    LoadingState(modifier = Modifier.align(Alignment.Center))
+                }
+                uiState.isError -> {
+                    ErrorState(
+                        onRetry = { viewModel.onQueryChange(uiState.query, currentLanguage) },
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+                uiState.query.isBlank() -> {
+                    Column(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                            modifier = Modifier.size(64.dp)
                         )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = stringResource(id = R.string.empty_search_prompt),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+                uiState.searchResults.isEmpty() -> {
+                    EmptyState(
+                        message = stringResource(id = R.string.no_results),
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(uiState.searchResults) { movie ->
+                            MovieCard(
+                                movie = movie,
+                                genresMap = uiState.genresMap,
+                                onClick = { onMovieClick(movie.id) }
+                            )
+                        }
                     }
                 }
             }
