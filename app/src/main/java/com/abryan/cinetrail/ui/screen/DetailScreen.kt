@@ -1,7 +1,9 @@
 package com.abryan.cinetrail.ui.screen
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -106,6 +108,9 @@ fun DetailScreen(
                 val detail = uiState.movieDetail!!
                 val scrollState = rememberScrollState()
                 var isSynopsisExpanded by remember { mutableStateOf(false) }
+                val configuration = LocalConfiguration.current
+                val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+                val backdropHeight = if (isLandscape) 240.dp else 340.dp
 
                 Column(
                     modifier = Modifier
@@ -116,7 +121,7 @@ fun DetailScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(340.dp)
+                            .height(backdropHeight)
                     ) {
                         AsyncImage(
                             model = detail.getFullBackdropUrl() ?: detail.getFullPosterUrl(),
