@@ -33,6 +33,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BrokenImage
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
@@ -129,7 +130,7 @@ fun MovieCard(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                // Baris Tahun Rilis & Rating Bintang
+                // Baris Tahun Rilis & 5 Bintang Rating Emas (sesuai referensi UI)
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -151,20 +152,25 @@ fun MovieCard(
                         }
                     }
 
-                    // Rating dengan aksen emas StarGold
+                    // 5 Bintang Emas visual
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        horizontalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = "Rating",
-                            tint = StarGold,
-                            modifier = Modifier.size(16.dp)
-                        )
+                        val ratingOutOf5 = ((movie.voteAverage ?: 0.0) / 2.0).coerceIn(0.0, 5.0)
+                        repeat(5) { starIndex ->
+                            val isFilled = starIndex < ratingOutOf5.toInt()
+                            Icon(
+                                imageVector = Icons.Default.Star,
+                                contentDescription = null,
+                                tint = if (isFilled) StarGold else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f),
+                                modifier = Modifier.size(13.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(3.dp))
                         Text(
                             text = String.format(Locale.getDefault(), "%.1f", movie.voteAverage ?: 0.0),
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
@@ -313,6 +319,24 @@ fun HeroCarousel(
                             color = Color.White,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
+                        )
+                    }
+
+                    // Tombol Putar Merah di sudut kanan bawah hero (sesuai referensi UI)
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(16.dp)
+                            .size(44.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFE50914)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = "Play",
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 }
