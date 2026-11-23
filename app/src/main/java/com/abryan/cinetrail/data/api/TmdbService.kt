@@ -1,6 +1,7 @@
 package com.abryan.cinetrail.data.api
 
 import com.abryan.cinetrail.data.model.GenreResponse
+import com.abryan.cinetrail.data.model.MovieCreditsResponse
 import com.abryan.cinetrail.data.model.MovieDetailDto
 import com.abryan.cinetrail.data.model.MovieResponse
 import com.abryan.cinetrail.data.model.WatchProviderResponse
@@ -59,4 +60,10 @@ interface TmdbService {
     suspend fun getWatchProviders(
         @Path("id") movieId: Int
     ): WatchProviderResponse
+
+    @GET("movie/{id}/credits")
+    suspend fun getMovieCredits(
+        @Path("id") movieId: Int,
+        @Query("language") language: String
+    ): MovieCreditsResponse
 }

@@ -70,6 +70,10 @@ class DashboardViewModelTest {
             return WatchProviderResponse(movieId, emptyMap())
         }
 
+        override suspend fun getMovieCredits(movieId: Int, language: String): com.abryan.cinetrail.data.model.MovieCreditsResponse {
+            return com.abryan.cinetrail.data.model.MovieCreditsResponse(movieId, emptyList())
+        }
+
         private fun createMovie(id: Int, title: String) = MovieDto(
             id = id,
             title = title,

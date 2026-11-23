@@ -91,6 +91,11 @@ class MovieRepositoryTest {
             return WatchProviderResponse(movieId, mapOf("ID" to idRegion))
         }
 
+        override suspend fun getMovieCredits(movieId: Int, language: String): com.abryan.cinetrail.data.model.MovieCreditsResponse {
+            val actor = com.abryan.cinetrail.data.model.CastDto(101, "Reza Rahadian", "Habibie", "/reza.jpg")
+            return com.abryan.cinetrail.data.model.MovieCreditsResponse(movieId, listOf(actor))
+        }
+
         private fun createMovie(id: Int, title: String) = MovieDto(
             id = id,
             title = title,

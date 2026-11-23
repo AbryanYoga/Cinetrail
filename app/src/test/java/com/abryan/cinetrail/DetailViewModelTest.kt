@@ -105,6 +105,11 @@ class DetailViewModelTest {
                 )
             )
         }
+
+        override suspend fun getMovieCredits(movieId: Int, language: String): com.abryan.cinetrail.data.model.MovieCreditsResponse {
+            val actor = com.abryan.cinetrail.data.model.CastDto(101, "Leonardo DiCaprio", "Dom Cobb", "/leo.jpg")
+            return com.abryan.cinetrail.data.model.MovieCreditsResponse(movieId, listOf(actor))
+        }
     }
 
     @Before

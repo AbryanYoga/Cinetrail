@@ -2,6 +2,7 @@ package com.abryan.cinetrail.data.repository
 
 import com.abryan.cinetrail.data.api.RetrofitClient
 import com.abryan.cinetrail.data.api.TmdbService
+import com.abryan.cinetrail.data.model.CastDto
 import com.abryan.cinetrail.data.model.GenreDto
 import com.abryan.cinetrail.data.model.MovieDetailDto
 import com.abryan.cinetrail.data.model.MovieDto
@@ -102,6 +103,14 @@ class MovieRepository(
             response.results?.get(regionCode.uppercase())
         } catch (e: Exception) {
             null
+        }
+    }
+
+    suspend fun getMovieCredits(movieId: Int, language: String): List<CastDto> {
+        return try {
+            api.getMovieCredits(movieId, language).cast ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
         }
     }
 

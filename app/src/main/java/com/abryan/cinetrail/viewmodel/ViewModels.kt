@@ -3,6 +3,7 @@ package com.abryan.cinetrail.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abryan.cinetrail.R
+import com.abryan.cinetrail.data.model.CastDto
 import com.abryan.cinetrail.data.model.GenreDto
 import com.abryan.cinetrail.data.model.MovieDetailDto
 import com.abryan.cinetrail.data.model.MovieDto
@@ -158,8 +159,10 @@ data class DetailUiState(
     val isLoading: Boolean = true,
     val isError: Boolean = false,
     val movieDetail: MovieDetailDto? = null,
+    val cast: List<CastDto> = emptyList(),
     val watchProviderRegion: WatchProviderRegion? = null,
-    val selectedRegion: String = "ID"
+    val selectedRegion: String = "ID",
+    val isFavorite: Boolean = false
 )
 
 class DetailViewModel(
@@ -176,10 +179,12 @@ class DetailViewModel(
             detailResult.fold(
                 onSuccess = { detail ->
                     val providers = repository.getWatchProviders(movieId, _uiState.value.selectedRegion)
+                    val cast = repository.getMovieCredits(movieId, language)
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         isError = false,
                         movieDetail = detail,
+                        cast = cast,
                         watchProviderRegion = providers
                     )
                 },
@@ -191,6 +196,10 @@ class DetailViewModel(
                 }
             )
         }
+    }
+
+    fun toggleFavorite() {
+        _uiState.value = _uiState.value.copy(isFavorite = !_uiState.value.isFavorite)
     }
 
     fun changeRegion(region: String, movieId: Int) {

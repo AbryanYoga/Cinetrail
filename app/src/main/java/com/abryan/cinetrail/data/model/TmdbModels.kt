@@ -48,7 +48,8 @@ data class MovieDetailDto(
     @SerializedName("release_date") val releaseDate: String?,
     @SerializedName("runtime") val runtime: Int?,
     @SerializedName("genres") val genres: List<GenreDto>?,
-    @SerializedName("origin_country") val originCountry: List<String>?
+    @SerializedName("origin_country") val originCountry: List<String>?,
+    @SerializedName("adult") val adult: Boolean? = false
 ) {
     fun getFullPosterUrl(): String? {
         return posterPath?.let { "https://image.tmdb.org/t/p/w500$it" }
@@ -58,6 +59,20 @@ data class MovieDetailDto(
         return backdropPath?.let { "https://image.tmdb.org/t/p/w780$it" }
     }
 }
+
+data class CastDto(
+    @SerializedName("id") val id: Int,
+    @SerializedName("name") val name: String,
+    @SerializedName("character") val character: String?,
+    @SerializedName("profile_path") val profilePath: String?
+) {
+    fun getFullProfileUrl(): String? = profilePath?.let { "https://image.tmdb.org/t/p/w185$it" }
+}
+
+data class MovieCreditsResponse(
+    @SerializedName("id") val id: Int,
+    @SerializedName("cast") val cast: List<CastDto>?
+)
 
 data class WatchProviderDto(
     @SerializedName("provider_id") val providerId: Int,
